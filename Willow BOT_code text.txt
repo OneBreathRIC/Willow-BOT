@@ -1,0 +1,64 @@
+//************** server.js ****************
+
+const express = require("express")
+
+const server = express()
+
+server.all("/", (req, res) => {
+  res.send("Bot is running!")
+})
+
+function keepAlive() {
+  server.listen(3000, () => {
+    console.log("Server is ready.")
+  })
+}
+
+module.exports = keepAlive
+
+//*************** index.js ****************
+
+const Discord = require("discord.js")
+const fetch = require("node-fetch")
+const Database = require("@replit/database")
+const keepAlive = require("./server")
+
+const db = new Database()
+const client = new Discord.Client()
+
+const rules = '925104024582230064'
+const New_Member_role = '925104024544493640'
+
+
+client.on("ready", () => {
+  console.log(`Logged in as ${client.user.tag}!`)
+})
+
+client.on("guildMemberAdd", (member) => {
+  console.log(member);
+
+  member.roles.add(New_Member_role);
+
+  const message1 = 'Welcome to our server! \n\nPlease let us know what time works best for you to do a quick tour. \n\nOnce we have a time that works best, we will have someone help you here.'
+
+  const channel1 = member.guild.channels.cache.get('925104025165246517')
+
+  channel1.send(message1)
+});
+
+client.on("messageReactionAdd", (reaction, member) => {
+  if (reaction.message.channel.id === rules) {
+console.log('add')
+  }
+})
+
+client.on("message", msg => {
+  if (msg.author.bot) return
+
+  if (msg.content === "$done") {
+    msg.channel.send("@New Members(s) thank you for joining and welcome again! Please either choose a faction that's already established or come up with your own.\n\nIf you want your own, you'll need a custom banner to post at spawn, a faction name, and a trade you'll be trading with.\n\nIf you are not a member of a faction, please do not stay at **ANY** base once the tour has ended. And, please do not take any items out of chests that are not yours.'\n\n*Be sure to react to this message so we know you understand and we will give you Member permissions on the server.*")
+  }
+})
+
+keepAlive()
+client.login(process.env.willow)
